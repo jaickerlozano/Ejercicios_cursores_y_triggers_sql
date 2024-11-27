@@ -1,0 +1,29 @@
+DROP TABLE IF EXISTS AUDIT;
+CREATE TABLE AUDIT (
+	codigo int auto_increment primary key,
+    tabla varchar (50),
+    operacion varchar(50),
+    usuario varchar(50)
+);
+
+DELIMITER //
+
+DROP TRIGGER IF EXISTS audit_cursos//
+
+CREATE TRIGGER audit_cursos BEFORE INSERT ON CURSOS FOR EACH ROW
+BEGIN
+	INSERT INTO AUDIT(TABLA, OPERACION, USUARIO) VALUES ('CURSOS', 'INSERT', current_user());
+END //
+
+INSERT INTO CURSOS VALUES(3333333, 'CURSO-3333333', 100)//
+INSERT INTO CURSOS VALUES(88888, 'CURSO-88888', 100)//
+
+SELECT * FROM AUDIT//
+
+
+
+
+
+
+
+
