@@ -39,6 +39,25 @@ INSERT INTO profesores(cod_profesor, nombre, apellidos,email,edad) VALUES (60, '
 
 -- Sin error, inserta la fila y se inserta la operación en la tabla auditoria.
 INSERT INTO profesores(cod_profesor, nombre, apellidos,email,edad) VALUES (60, 'Fernando', 'Rozas','fernandorozas@gmail.com',NULL) //
-DELETE FROM profesores WHERE cod_profesor = 60 //
+DELETE FROM profesores WHERE cod_profesor = 70 //
 SELECT * FROM auditoria//
 SELECT * FROM PROFESORES//
+
+-- Modificacion para que sea el trigger de tipo after.
+DROP TRIGGER IF EXISTS insert_profesores//
+DELIMITER // 
+CREATE TRIGGER insert_profesores AFTER INSERT ON profesores FOR EACH ROW
+BEGIN
+    -- b.
+	IF NEW.email NOT LIKE '%@%.%' THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'El email no tiene un formato válido';
+	END IF;
+    INSERT INTO auditoria (tabla,operacion,usuario) VALUES ('profesores', 'INSERT', CURRENT_USER());
+END//
+
+-- Con error. Proporciona un mensaje de texto indicando que el email no tiene un formato correcto
+INSERT INTO profesores(cod_profesor, nombre, apellidos,email,edad) VALUES (70, 'Jose', 'Carreño','josecarreñogmail.com',NULL) //
+
+-- Sin error, inserta la fila y se inserta la operación en la tabla auditoria.
+INSERT INTO profesores(cod_profesor, nombre, apellidos,email,edad) VALUES (70, 'Jose', 'Carreño','josecarreño@gmail.com',NULL) //
